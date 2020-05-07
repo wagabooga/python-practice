@@ -10,18 +10,26 @@ class Inventory:
 # class that keeps track of possibilities
 class DecisionTree:
     def __init__(self):
-        root_decision_tree_node = None
+        self.root_decision_tree_node = None
 
-
-    def create_decision_tree(self):
-        return None
+    def fill_decision_tree(self):
+        game_map = create_game_map()
+        what_happened_strings_map = create_what_happened_strings_map()
+        node_list = []
+        for node_id in game_map.keys():
+            what_happened = what_happened_strings_map[node_id]
+            connections = game_map[node_id]
+            decision_tree_node = DecisionTreeNode(what_happened, node_id, connections,)
+            node_list.append(decision_tree_node)
+        print(node_list)
 
 
 # class that represents a single possible decision
 class DecisionTreeNode:
-    def __init__(self, what_happened):
+    def __init__(self, what_happened, node_id, connections,):
         self.what_happened = what_happened
-        connections = {}
+        self.node_id = node_id
+        self.connections = connections
 
 
 # class to keep track of rng
@@ -56,7 +64,7 @@ def create_rng_odds():
 # this map represents which nodes have certain types of RNG
 def create_rng_node_map():
     rng_node_map = {
-        "corona": (14, 21, 31),
+        "corona": (14, 21, 30),
         "police": (17, 28),
         "mugged": (25, 27),
     }
@@ -137,9 +145,10 @@ def create_what_happened_strings_map():
         30: "needs to be completed",
         31: "needs to be completed",
         32: "needs to be completed",
-        33: "needs to be completed",
-        34: "gg lol",
+        33: "gg lol",
     }
+    return what_happened_strings_map
+
 # this map represents how decision nodes are connected in the game
 # returns the map
 def create_game_map():
@@ -160,23 +169,23 @@ def create_game_map():
         14: (17, 18, 23),
         15: (19, 20),
         16: (21, 22),
-        17: (33, 34),
+        17: (32, 33),
         18: (10),
         19: (),
         20: (24),
         21: (),
         22: (26, 27),
         23: (22),
-        24: (25, 30),
-        25: (32, 34),
-        26: (31),
-        27: (32, 34),
-        28: (33, 34),
-        30: (34),
-        31: (34),
+        24: (25, 29),
+        25: (31, 33),
+        26: (30),
+        27: (31, 33),
+        28: (32, 33),
+        29: (33),
+        30: (33),
+        31: (),
         32: (),
         33: (),
-        34: (),
     }
     return game_map
 
@@ -185,8 +194,13 @@ def create_game_map():
 def game_run():
     is_user_playing = True
     print("Welcome to the game!")
+    game_decision_tree = DecisionTree()
+    game_decision_tree.fill_decision_tree()
+
+
     while is_user_playing == True:
         player = create_player()
+        print(player.name)
         is_user_playing = False
 
 

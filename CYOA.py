@@ -11,32 +11,43 @@ class Inventory:
 class DecisionTree:
     def __init__(self):
         self.root_decision_tree_node = None
+        self.node_map = self.create_decision_tree()
 
-    def fill_decision_tree(self):
+    def create_decision_tree(self):
         game_map = create_game_map()
         what_happened_strings_map = create_what_happened_strings_map()
-        node_list = []
+        rng_node_map = create_rng_node_map()
+        node_map = {}
         for node_id in game_map.keys():
             what_happened = what_happened_strings_map[node_id]
             connections = game_map[node_id]
-            decision_tree_node = DecisionTreeNode(what_happened, node_id, connections,)
-            node_list.append(decision_tree_node)
-        print(node_list)
+            if node_id in rng_node_map:
+                rng_type = rng_node_map[node_id]
+            else:
+                rng_type = None
+            rng = RNG(rng_type)
+            decision_tree_node = DecisionTreeNode(what_happened, node_id, connections, rng)
+            node_map[node_id] = decision_tree_node
+        return node_map
 
 
 # class that represents a single possible decision
 class DecisionTreeNode:
-    def __init__(self, what_happened, node_id, connections,):
+    def __init__(self, what_happened, node_id, connections, rng):
         self.what_happened = what_happened
         self.node_id = node_id
         self.connections = connections
-
+        self.rng = rng
 
 # class to keep track of rng
 class RNG:
-    def __init__(self, rng_type, rng_odds):
+    def __init__(self, rng_type,):
         self.rng_type = rng_type
-        self.rng_odds = rng_odds
+        self.rng_odds_map = create_rng_odds_map()
+        if rng_type in self.rng_odds_map:
+            self.rng_odds = self.rng_odds_map[rng_type]
+        else:
+            self.rng_odds = 0
 
     # This is a function that creates an outcomes based on odds
     def get_negative_event_outcome(self):
@@ -56,7 +67,7 @@ class Player:
 
 # this function returns a dictionary that maps a string to a decimal value
 # the strings represent different types of rng and the decimal value represents the probability
-def create_rng_odds():
+def create_rng_odds_map():
     rng_dict = {"corona": .5, "police": .66, "mugged": .25}
     return rng_dict
 
@@ -64,9 +75,13 @@ def create_rng_odds():
 # this map represents which nodes have certain types of RNG
 def create_rng_node_map():
     rng_node_map = {
-        "corona": (14, 21, 30),
-        "police": (17, 28),
-        "mugged": (25, 27),
+        14: "corona",
+        21: "corona",
+        30: "corona",
+        17: "police",
+        28: "police",
+        25: "mugged",
+        27: "mugged",
     }
     return rng_node_map
 
@@ -195,7 +210,7 @@ def game_run():
     is_user_playing = True
     print("Welcome to the game!")
     game_decision_tree = DecisionTree()
-    game_decision_tree.fill_decision_tree()
+    game_decision_tree.create_decision_tree()
 
 
     while is_user_playing == True:

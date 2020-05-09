@@ -10,8 +10,8 @@ class Inventory:
 # class that keeps track of possibilities
 class DecisionTree:
     def __init__(self):
-        self.root_decision_tree_node = None
         self.node_map = self.create_decision_tree()
+        self.root_decision_tree_node = self.node_map[1]
 
     def create_decision_tree(self):
         game_map = create_game_map()
@@ -26,7 +26,7 @@ class DecisionTree:
             else:
                 rng_type = None
             rng = RNG(rng_type)
-            decision_tree_node = DecisionTreeNode(what_happened, node_id, connections, rng)
+            decision_tree_node = DecisionTreeNode(what_happened, node_id, connections, rng,)
             node_map[node_id] = decision_tree_node
         return node_map
 
@@ -208,15 +208,15 @@ def create_game_map():
 # this function runs the game loop
 def game_run():
     is_user_playing = True
-    print("Welcome to the game!")
     game_decision_tree = DecisionTree()
     game_decision_tree.create_decision_tree()
-
 
     while is_user_playing == True:
         player = create_player()
         print(player.name)
-        is_user_playing = False
+        print("Welcome to the game!")
+        current_decision_tree_node = game_decision_tree.root_decision_tree_node
+        is_user_playing = prompt_decision(current_decision_tree_node)
 
 
 # this function prompts the user for their name
@@ -225,6 +225,14 @@ def create_player():
     player_name = input("What is your name?")
     player = Player(player_name)
     return player
+
+
+def prompt_decision(current_decision_tree_node):
+    print(current_decision_tree_node.what_happened)
+    if len(current_decision_tree_node.connections) == 0:
+        return False
+    # print the decisions string
+    # fill in later
 
 
 game_run()

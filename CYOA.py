@@ -17,27 +17,31 @@ class DecisionTree:
         game_map = create_game_map()
         what_happened_strings_map = create_what_happened_strings_map()
         rng_node_map = create_rng_node_map()
+        decision_strings_map = create_decision_strings_map()
         node_map = {}
         for node_id in game_map.keys():
             what_happened = what_happened_strings_map[node_id]
             connections = game_map[node_id]
+            decision_strings = decision_strings_map[node_id]
             if node_id in rng_node_map:
                 rng_type = rng_node_map[node_id]
             else:
                 rng_type = None
             rng = RNG(rng_type)
-            decision_tree_node = DecisionTreeNode(what_happened, node_id, connections, rng,)
+            decision_tree_node = DecisionTreeNode(what_happened, node_id, connections, rng, decision_strings)
             node_map[node_id] = decision_tree_node
         return node_map
 
 
 # class that represents a single possible decision
 class DecisionTreeNode:
-    def __init__(self, what_happened, node_id, connections, rng):
+    def __init__(self, what_happened, node_id, connections, rng, decision_strings):
         self.what_happened = what_happened
         self.node_id = node_id
         self.connections = connections
         self.rng = rng
+        self.decision_strings = decision_strings
+
 
 # class to keep track of rng
 class RNG:
@@ -164,6 +168,50 @@ def create_what_happened_strings_map():
     }
     return what_happened_strings_map
 
+
+# this function returns a dictionary that represents the choices
+def create_decision_strings_map():
+    decision_strings_map = {
+        1: ("1) Take the car", "2) Walk", "3) Bike"),
+        2: ("1) Take the highway", "2) Take the side streets"),
+        3: ("1) Enter the store", "2) See your friend"),
+        4: ("1) Join the party", "2) Continue Biking"),
+        5: (),
+        6: (),
+        7: ("1) Buy the mask", "2) Don't buy the mask"),
+        8: ("1) Don't go to the party", "2) Go to the party"),
+        9: ("1) Go to the party"),
+        10: (),
+        11: ("1) Take the bus", "2) Keep Walking"),
+        12: ("1) Take the bus", "2) Keep Walking"),
+        13: ("1) Go through city hall"),
+        14: ("1) Steal the helmet", "2)Don't steal the helmet"),
+        # rng determines number 15, but there are two outcomes
+        15: ("1) hop on the bus"),
+        16: ("1) Go through the forest", "2) Go through city hall"),
+        # rng determines number 17, but there are two outcomes
+        17: ("1) head to the store"),
+        18: (),
+        19: (),
+        20: ("1) Help the grandma", "2) Continue heading to the store"),
+        21:  (),
+        22:  ("needs to be completed", "2)tbd"),
+        23:  ("1)needs to be completed"),
+        24:  ("1)needs to be completed", "2)tbd"),
+        25:  ("1)needs to be completed", "2)tbd"),
+        26:  ("1) Walk through the protesters"),
+        # 27 and 28 are RNG choices, two outcomes
+        27:  ("1) head to the store"),
+        28:  ("1) head to the store"),
+        29:  ("1) head to the store"),
+        30:  ("1) head to the store"),
+        31:  (),
+        32:  (),
+        33:  (),
+    }
+    return decision_strings_map
+
+
 # this map represents how decision nodes are connected in the game
 # returns the map
 def create_game_map():
@@ -176,28 +224,28 @@ def create_game_map():
         6: (),
         7: (11, 12),
         8: (13, 14),
-        9: (14),
+        9: tuple([14]),
         10: (),
         11: (15, 16),
         12: (15, 16),
-        13: (22),
+        13: tuple([22]),
         14: (17, 18, 23),
         15: (19, 20),
         16: (21, 22),
         17: (32, 33),
-        18: (10),
+        18: tuple([10]),
         19: (),
-        20: (24),
+        20: tuple([24]),
         21: (),
         22: (26, 27),
-        23: (22),
+        23: tuple([22]),
         24: (25, 29),
         25: (31, 33),
-        26: (30),
+        26: tuple([30]),
         27: (31, 33),
         28: (32, 33),
-        29: (33),
-        30: (33),
+        29: tuple([33]),
+        30: tuple([33]),
         31: (),
         32: (),
         33: (),
@@ -210,14 +258,17 @@ def game_run():
     is_user_playing = True
     game_decision_tree = DecisionTree()
     game_decision_tree.create_decision_tree()
+    player = create_player()
+    print(player.name)
+    print("Welcome to the game!")
+    current_decision_tree_node = game_decision_tree.root_decision_tree_node
 
-    while is_user_playing == True:
-        player = create_player()
-        print(player.name)
-        print("Welcome to the game!")
-        current_decision_tree_node = game_decision_tree.root_decision_tree_node
-        is_user_playing = prompt_decision(current_decision_tree_node)
-
+    while is_user_playing is True:
+        is_user_playing, decision = prompt_decision(current_decision_tree_node)
+        if is_user_playing is False and decision is None:
+            break
+        next_decision_tree_node = find_next_decision_tree_node(current_decision_tree_node, decision, game_decision_tree)
+        current_decision_tree_node = next_decision_tree_node
 
 # this function prompts the user for their name
 # and then creates and returns the player
@@ -230,9 +281,18 @@ def create_player():
 def prompt_decision(current_decision_tree_node):
     print(current_decision_tree_node.what_happened)
     if len(current_decision_tree_node.connections) == 0:
-        return False
-    # print the decisions string
-    # fill in later
+        return False, None
+    for decision_string in current_decision_tree_node.decision_strings:
+        print(decision_string)
+    decision = input("what do you do? (response should be a number)")
+    # TODO: error checking
+    return True, decision
+
+
+def find_next_decision_tree_node(current_decision_tree_node, decision, game_decision_tree):
+    next_node_id = current_decision_tree_node.connections[int(decision) - 1]
+    next_decision_tree_node = game_decision_tree.node_map[next_node_id]
+    return next_decision_tree_node
 
 
 game_run()

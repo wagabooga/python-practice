@@ -1,0 +1,61 @@
+choose your own adventure
+
+give user decision prompts until ending
+each decision goes to next
+
+randomness elements
+~240 pm vod
+
+concepts to use
+- user inputs
+- randomness (RNG)
+- logic based on inputs (input handling) (lots of ifs)
+- loops
+- 
+
+
+
+
+
+design details
+-healthbar(??)
+-randomness
+- inventory (list/dictionary)
+- time limit for grocery store based on # of choices
+
+
+
+possible items:
+Helmet
+Mask
+toilet paper
+
+
+endings:
+Death ending, 
+-highway crash
+-garbage truck
+-empty bus
+-forest bear
+-no helmet
+-rng caught n shot from party
+
+Restart ending
+-no help woman, mugged
+-long way, mugged
+
+
+
+next steps
+*read the code*
+-build the tree, use a dictionary* nested dictionary structure*
+each tree node has children i can traverse to
+
+
+take node list, run through connections and hook up the nodes
+pinters
+
+
+
+
+
